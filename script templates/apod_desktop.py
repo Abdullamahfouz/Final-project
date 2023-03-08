@@ -15,6 +15,7 @@ from datetime import date
 import os
 import image_lib
 import inspect
+import sys
 
 # Global variables
 image_cache_dir = None  # Full path of image cache directory
@@ -24,6 +25,7 @@ def main():
     ## DO NOT CHANGE THIS FUNCTION ##
     # Get the APOD date from the command line
     apod_date = get_apod_date()    
+    
 
     # Get the path of the directory in which this script resides
     script_dir = get_script_dir()
@@ -52,8 +54,20 @@ def get_apod_date():
     Returns:
         date: APOD date
     """
-    # TODO: Complete function body
-    apod_date = date.fromisoformat('2022-12-25')
+   # this implementation checks whether a command-line argument was provided,
+    if len(sys.argv) > 1:
+        try:
+            apod_date = date.fromisoformat(sys.argv[1])
+        except ValueError:
+            print(f"Error: Invalid date format: {sys.argv[1]}. Use ISO format (YYYY-MM-DD).")
+            sys.exit(1)
+    else:
+        apod_date = date.today()
+    
+    if apod_date > date.today():
+        print(f"Error: Date {apod_date.isoformat()} is in the future.")
+        sys.exit(1)
+        
     return apod_date
 
 def get_script_dir():
