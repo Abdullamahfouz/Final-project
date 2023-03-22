@@ -16,6 +16,10 @@ import os
 import image_lib
 import inspect
 import sys
+import pathlib  
+import hashlib
+import requests
+import sqlite3
 
 # Global variables
 image_cache_dir = None  # Full path of image cache directory
@@ -94,11 +98,23 @@ def init_apod_cache(parent_dir):
     """
     global image_cache_dir
     global image_cache_db
-    # TODO: Determine the path of the image cache directory
-    # TODO: Create the image cache directory if it does not already exist
-    # TODO: Determine the path of image cache DB
-    # TODO: Create the DB if it does not already exist
 
+    image_cache_dir = os.path.join(parent_dir, 'APOD_cache')
+    if not os.path.exists(image_cache_dir):
+        os.makedirs(image_cache_dir)
+
+    image_cache_db = os.path.join(image_cache_dir, 'apod_cache.db')
+    if not os.path.exists(image_cache_db):
+        conn = sqlite3.connect(image_cache_db)
+        cursor = conn.cursor()
+        cursor.execute('''CREATE TABLE apod (
+                            id INTEGER PRIMARY KEY,
+                            title TEXT NOT NULL,
+                            explanation TEXT,  # Change this line
+                            file_path TEXT NOT NULL,
+                            sha256 TEXT NOT NULL UNIQUE)''')
+        conn.commit()
+        conn.close()
 def add_apod_to_cache(apod_date):
     """Adds the APOD image from a specified date to the image cache.
      
@@ -112,14 +128,40 @@ def add_apod_to_cache(apod_date):
     Returns:
         int: Record ID of the APOD in the image cache DB, if a new APOD is added to the
         cache successfully or if the APOD already exists in the cache. Zero, if unsuccessful.
+    
     """
     print("APOD date:", apod_date.isoformat())
-    # TODO: Download the APOD information from the NASA API
-    # TODO: Download the APOD image
-    # TODO: Check whether the APOD already exists in the image cache
-    # TODO: Save the APOD file to the image cache directory
-    # TODO: Add the APOD information to the DB
-    return 0
+    api_key = "0Q7g3afMUT7qvSLWqQ7P6IyLbjXzVN4Ju6c8vgRt"
+    base_url = "https://api.nasa.gov/planetary/apod"
+    params = {"date": apod_date.isoformat(), "api_key": api_key}
+
+    response = requests.get(base_url, params=params)
+    response.raise_for_status()
+
+    apod_data = response.json()
+    image_url = apod_data["url"]
+
+    image_response = requests.get(image_url)
+    image_response.raise_for_status()
+
+    image_content = image_response.content
+    sha256 = hashlib.sha256(image_content).hexdigest()
+
+    apod_id = get_apod_id_from_db(sha256)
+    if apod_id == 0:
+        title = apod_data["title"]
+        explanation = apod_data["explanation"]
+        file_path = determine_apod_file_path(title, image_url)
+
+        with open(file_path, "wb") as image_file:
+            image_file.write(image_content)
+
+        apod_id = add_apod_to_db(title, explanation, file_path, sha256)
+
+    return apod_id
+
+   
+    
 
 def add_apod_to_db(title, explanation, file_path, sha256):
     """Adds specified APOD information to the image cache DB.
