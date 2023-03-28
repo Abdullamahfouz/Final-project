@@ -107,13 +107,13 @@ def init_apod_cache(parent_dir):
     image_cache_dir = os.path.join(parent_dir, 'APOD_cache')
    #   checks if the image_cache_dir does not exist. If it doesn't, 
    # the directory is created using the os.makedirs() function.   
-    if not os.path.exists(image_cache_dir):
+    if os.path.exists(image_cache_dir) == False:
         os.makedirs(image_cache_dir)
      # creates the path for the image cache database  by 
      # joining the image_cache_dir with the database file name 'apod_cache.db'.
     image_cache_db = os.path.join(image_cache_dir, 'apod_cache.db')
      # checks if the file does not already exist
-    if not os.path.exists(image_cache_db):
+    if os.path.exists(image_cache_db) == False:
         # If the database file does not exist, creates a SQLite database by creating 
         # a new file named 'apod_cache.db' in the image Dir .
         con = sqlite3.connect(image_cache_db)
@@ -125,9 +125,9 @@ def init_apod_cache(parent_dir):
                 (
                     id    INTEGER PRIMARY KEY,
                     title TEXT NOT NULL,
-                    
+                    explanation TEXT NOT NULL,
                     file_path TEXT NOT NULL,
-                    sha256 TEXT NOT NULL UNIQUE 
+                    sha256 TEXT NOT NULL 
                 );
         """ 
         #  executes an SQL command for the database above
@@ -151,6 +151,7 @@ def add_apod_to_cache(apod_date):
         cache successfully or if the APOD already exists in the cache. Zero, if unsuccessful.
     
     """
+    print("APOD date:", apod_date.isoformat())
     # Set up the API request parameters with the APOD date and API key
     params = {
         "date": apod_date.isoformat(), 
