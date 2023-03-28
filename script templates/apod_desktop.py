@@ -20,6 +20,8 @@ import pathlib
 import hashlib
 import requests
 import sqlite3
+api_key = "0Q7g3afMUT7qvSLWqQ7P6IyLbjXzVN4Ju6c8vgRt"
+base_url = "https://api.nasa.gov/planetary/apod"
 
 # Global variables
 image_cache_dir = None  # Full path of image cache directory
@@ -130,9 +132,7 @@ def add_apod_to_cache(apod_date):
         cache successfully or if the APOD already exists in the cache. Zero, if unsuccessful.
     
     """
-    print("APOD date:", apod_date.isoformat())
-    api_key = "0Q7g3afMUT7qvSLWqQ7P6IyLbjXzVN4Ju6c8vgRt"
-    base_url = "https://api.nasa.gov/planetary/apod"
+    
     params = {"date": apod_date.isoformat(), "api_key": api_key}
 
     response = requests.get(base_url, params=params)
