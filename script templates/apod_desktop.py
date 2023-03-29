@@ -121,7 +121,7 @@ def init_apod_cache(parent_dir):
         cur = con.cursor()
        # create a new table named 'apod' in the database. 
         query = """
-                 CREATE TABLE apod IF NOT EXIST  
+                 CREATE TABLE IF NOT EXIST apod 
                 (
                     id    INTEGER PRIMARY KEY,
                     title TEXT NOT NULL,
@@ -159,7 +159,6 @@ def add_apod_to_cache(apod_date):
         }
     # send a GET request to the NASA APOD API using the base_url and params dictionary.
     response = requests.get(base_url, params=params)
-    response.raise_for_status()
     # the JSON response and get the image URL
     apod_data = response.json()
     image_url = apod_data["url"]
@@ -168,9 +167,9 @@ def add_apod_to_cache(apod_date):
      # retrieve the content of the downloaded image and store it in the image_content variable. 
      # A SHA-256 hash of the image content is then computed and stored in the sha256 variable.
 
-    image_content = image_response.content
-    sha256 = hashlib.sha256(image_content).hexdigest()
-
+    image_hash = image_response.content
+    sha256 = hashlib.sha256(image_hash).hexdigest()
+    print(f'APOD SHA-256: {sha256}')
     
 
 
