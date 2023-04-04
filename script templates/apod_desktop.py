@@ -104,16 +104,18 @@ def init_apod_cache(parent_dir):
     global image_cache_dir
     global image_cache_db
    # creates the path for the image cache directory joining the parent dircetory with the subdirectory  
-    image_cache_dir = os.path.join(parent_dir, 'APOD_cache')
+    image_cache_dir = os.path.join(parent_dir, 'image_cache')
    #   checks if the image_cache_dir does not exist. If it doesn't, 
    # the directory is created using the os.makedirs() function.   
-    if os.path.exists(image_cache_dir) == False:
+    if not os.path.exists(image_cache_dir):
         os.makedirs(image_cache_dir)
+        print(f'Image cache directory: {image_cache_dir}')
+        print('Image cache directory created.')
      # creates the path for the image cache database  by 
      # joining the image_cache_dir with the database file name 'apod_cache.db'.
-    image_cache_db = os.path.join(image_cache_dir, 'apod_cache.db')
+    image_cache_db = os.path.join(image_cache_dir, 'image_cache.db')
      # checks if the file does not already exist
-    if os.path.exists(image_cache_db) == False:
+    if not os.path.exists(image_cache_db) :
         # If the database file does not exist, creates a SQLite database by creating 
         # a new file named 'apod_cache.db' in the image Dir .
         con = sqlite3.connect(image_cache_db)
@@ -121,14 +123,14 @@ def init_apod_cache(parent_dir):
         cur = con.cursor()
        # create a new table named 'apod' in the database. 
         query = """
-                 CREATE TABLE IF NOT EXIST apod 
-                (
-                    id    INTEGER PRIMARY KEY,
-                    title TEXT NOT NULL,
-                    explanation TEXT NOT NULL,
-                    file_path TEXT NOT NULL,
-                    sha256 TEXT NOT NULL 
-                );
+            CREATE TABLE IF NOT EXISTS image_apod
+            (
+               id    INTEGER PRIMARY KEY,
+               title TEXT NOT NULL,
+               explanation TEXT NOT NULL,
+               file_path TEXT NOT NULL,
+               sha256 TEXT NOT NULL 
+            );
         """ 
         #  executes an SQL command for the database above
         cur.execute(query)
@@ -136,6 +138,8 @@ def init_apod_cache(parent_dir):
         con.commit()
         # closes the connection to the SQLite database
         con.close()
+        print(f'Image cache DB created: {image_cache_db}')
+        print('Image cache DB created.')
 def add_apod_to_cache(apod_date):
     """Adds the APOD image from a specified date to the image cache.
      
@@ -152,25 +156,7 @@ def add_apod_to_cache(apod_date):
     
     """
     print("APOD date:", apod_date.isoformat())
-    # Set up the API request parameters with the APOD date and API key
-    params = {
-        "date": apod_date.isoformat(), 
-        "api_key": api_key
-        }
-    # send a GET request to the NASA APOD API using the base_url and params dictionary.
-    response = requests.get(base_url, params=params)
-    # the JSON response and get the image URL
-    apod_data = response.json()
-    image_url = apod_data["url"]
-    # These lines send a GET request to download the APOD image from the image_url'
-    image_response = requests.get(image_url)
-     # retrieve the content of the downloaded image and store it in the image_content variable. 
-     # A SHA-256 hash of the image content is then computed and stored in the sha256 variable.
-
-    image_hash = image_response.content
-    sha256 = hashlib.sha256(image_hash).hexdigest()
-    print(f'APOD SHA-256: {sha256}')
-    
+    return
 
 
    
