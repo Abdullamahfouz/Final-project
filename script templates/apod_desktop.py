@@ -206,7 +206,7 @@ def add_apod_to_db(title, explanation, file_path, sha256):
          path, 
          sha256
         )
-    VALUES (?, ?, ?, ?);
+        VALUES (?, ?, ?, ?);
  """
     
     apod = (title, explanation, file_path, sha256)
