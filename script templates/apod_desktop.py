@@ -188,9 +188,7 @@ def add_apod_to_db(title, explanation, file_path, sha256):
         int: The ID of the newly inserted APOD record, if successful.  Zero, if unsuccessful       
     """
      
-    apod_id = get_apod_id_from_db(sha256)
-    if apod_id != 0:
-        return apod_id
+    
     
   
     con = sqlite3.connect(image_cache_db)
