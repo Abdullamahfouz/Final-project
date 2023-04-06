@@ -5,8 +5,8 @@ import requests
 import ctypes
  
 def main():
-    image_data = download_image('https://images.pexels.com/photos/45201/kitty-cat-kitten-pet-45201.jpeg')
-    result = save_image_file(image_data, r'C:\temp\kitty.jpg')
+    image_data = download_image('https://apod.nasa.gov/apod/image/2205/NGC3521LRGBHaAPOD-20.jpg')
+    result = save_image_file(image_data, r'C:\temp\NGC3521LRGBHaAPOD-20.jpg')
     return
  
 def download_image(image_url):

@@ -5,8 +5,8 @@ Library for interacting with NASA's Astronomy Picture of the Day API.
 import requests
 
 
-key = '0Q7g3afMUT7qvSLWqQ7P6IyLbjXzVN4Ju6c8vgRt'
-
+api_key = '0Q7g3afMUT7qvSLWqQ7P6IyLbjXzVN4Ju6c8vgRt'
+url = 'https://api.nasa.gov/planetary/apod'
 
 def main():
     
@@ -23,12 +23,16 @@ def get_apod_info(apod_date):
     Returns:
         dict: Dictionary of APOD info, if successful. None if unsuccessful
     """
-    apod_info = {'api_key': key, 'date': apod_date}
-    params=apod_info
-    req = requests.get('https://api.nasa.gov/planetary/apod', params)
+    params = {'api_key': api_key, 
+              'date': apod_date
+              }
+    
+    req = requests.get(url, params)
 
     if req.status_code == 200:
         return req.json()
+    else:
+        print('failure')
 
     return None
 
@@ -41,9 +45,11 @@ def get_apod_image_url(apod_info_dict):
     Returns:
         str: APOD image URL
     """
-    # retutns the type of media
-    return
-   
+    
+    
+     
+    return None
+
 
 if __name__ == '__main__':
     main()
