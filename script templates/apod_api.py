@@ -5,8 +5,8 @@ Library for interacting with NASA's Astronomy Picture of the Day API.
 import requests
 
 
-api_key = '0Q7g3afMUT7qvSLWqQ7P6IyLbjXzVN4Ju6c8vgRt'
-url = 'https://api.nasa.gov/planetary/apod'
+API_KEY = '0Q7g3afMUT7qvSLWqQ7P6IyLbjXzVN4Ju6c8vgRt'
+APOD_URL = 'https://api.nasa.gov/planetary/apod'
 
 def main():
     
@@ -23,18 +23,22 @@ def get_apod_info(apod_date):
     Returns:
         dict: Dictionary of APOD info, if successful. None if unsuccessful
     """
-    params = {'api_key': api_key, 
+    image_params = {'api_key': API_KEY, 
               'date': apod_date
               }
     
-    req = requests.get(url, params)
-
+    req = requests.get(APOD_URL, params=image_params)
+    
+    
     if req.status_code == 200:
+        print('success')
         return req.json()
+        
     else:
         print('failure')
+        return None
 
-    return None
+    
 
 def get_apod_image_url(apod_info_dict):
     """Gets the URL of the APOD image from the dictionary of APOD information.
@@ -46,9 +50,25 @@ def get_apod_image_url(apod_info_dict):
         str: APOD image URL
     """
     
+    media_type = apod_info_dict['media_type']
     
-     
-    return None
+    # checks the media type
+    if media_type == 'image':
+        image_url = apod_info_dict['hdurl'] 
+        return image_url
+    else:
+        print('invalid media')
+    
+    
+    if media_type == 'video':
+        image_url = apod_info_dict['thumbnail_url']
+        return image_url
+    else:
+        print('invalid media')
+    
+    
+    
+    
 
 
 if __name__ == '__main__':

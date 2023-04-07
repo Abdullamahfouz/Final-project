@@ -20,6 +20,7 @@ import hashlib
 import requests
 import sqlite3
 from apod_api import get_apod_image_url
+import apod_api
 
 
 # Global variables
@@ -113,8 +114,14 @@ def init_apod_cache(parent_dir):
         print('Image cache directory created.')
      # creates the path for the image cache database  by 
      # joining the image_cache_dir with the database file 
+    else:
+        print(f'Image cache directory: {image_cache_dir}')
+        print('Image cache directory Already exists.')
+     # creates the path for the image cache database  by 
+     # joining the image_cache_dir with the database file 
     image_cache_db = os.path.join(image_cache_dir, 'image_cache.db')
-     # checks if the file does not already exist
+    
+    # checks if the file does not already exist
     if not os.path.exists(image_cache_db) :
         # If the database file does not exist, creates a SQLite database by creating 
         # a new file named 'apod_cache.db' in the image Dir .
@@ -140,6 +147,10 @@ def init_apod_cache(parent_dir):
         con.close()
         print(f'Image cache DB created: {image_cache_db}')
         print('Image cache DB created.')
+    else:
+        print(f'Image cache DB created: {image_cache_db}')
+        print('Image cache DB Already exists')
+        
 def add_apod_to_cache(apod_date):
     """Adds the APOD image from a specified date to the image cache.
      
@@ -155,19 +166,31 @@ def add_apod_to_cache(apod_date):
         cache successfully or if the APOD already exists in the cache. Zero, if unsuccessful.
     
     """
+    
+   # prints APOD date
     print("APOD date:", apod_date.isoformat())
     
-    apod_info = get_apod_info(apod_date)
-   
-    apod_image_url = get_apod_image_url(apod_info)
+    # gets the APOD date 
+    apod_info = apod_api.get_apod_info(apod_date)
+    print(f'Getting {apod_date} APOD information from NASA...success')
     
-    image_data = image_lib.download_image(apod_image_url)
+    image_title = apod_info['title']
+    print(f'Image title: {image_title}')
    
+    # gets the APOD image url
+    apod_image_url = get_apod_image_url(apod_info)
+    print(f'Image url:{apod_image_url}')
+    
+     # downlods the APOD image 
+    image_data = image_lib.download_image(apod_image_url)
     print(f'Downloaded image from {apod_image_url}')
     
+    # Checks the APOD SHA-256
     apod_hash = hashlib.sha256(image_data).hexdigest()
-    
     print(f'APOD SHA-256:{apod_hash}')
+    
+    
+    
     
     
     
