@@ -6,7 +6,7 @@ import ctypes
  
 def main():
     image_data = download_image('https://apod.nasa.gov/apod/image/2205/NGC3521LRGBHaAPOD-20.jpg')
-    result = save_image_file(image_data, r'C:\temp\NGC3521LRGBHaAPOD-20.jpg')
+    result = save_image_file(image_data, r'C:\Users\Abdullah\OneDrive\Desktop\COMP 593\Final-project\NGC3521LRGBHaAPOD-20.jpg')
     return
  
 def download_image(image_url):
