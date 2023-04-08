@@ -12,6 +12,9 @@ def main():
     
     apod_info = get_apod_info('1999-08-08')
     print(apod_info)
+    image_url = get_apod_image_url(apod_info)
+    print("Image URL:", image_url)
+    
     
     return
 
@@ -37,8 +40,8 @@ def get_apod_info(apod_date):
     else:
         print('failure')
         return None
-
     
+   
 
 def get_apod_image_url(apod_info_dict):
     """Gets the URL of the APOD image from the dictionary of APOD information.
@@ -56,11 +59,7 @@ def get_apod_image_url(apod_info_dict):
     if media_type == 'image':
         image_url = apod_info_dict['hdurl'] 
         return image_url
-    else:
-        print('invalid media')
-    
-    
-    if media_type == 'video':
+    elif media_type == 'video':
         image_url = apod_info_dict['thumbnail_url']
         return image_url
     else:
