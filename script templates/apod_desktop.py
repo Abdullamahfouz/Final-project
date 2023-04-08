@@ -23,6 +23,7 @@ from apod_api import get_apod_image_url
 import apod_api
 
 
+
 # Global variables
 image_cache_dir = None  # Full path of image cache directory
 image_cache_db = None   # Full path of image cache database
@@ -61,6 +62,9 @@ def get_apod_date():
         date: APOD date
     """
     # checks if there are more than one command-line arguments 
+    
+    min_date = date(1995,6,16)
+    
     if len(sys.argv) > 1:
          # tries to covert the agrs into a date 
         try:
@@ -70,8 +74,15 @@ def get_apod_date():
             print(f"Error: Invalid date format: {sys.argv[1]}. PLEASE use this format (YYYY-MM-DD).")
             sys.exit(1)
     # if no date provided just uses today's date 
+    
     else:
         apod_date = date.today()
+    
+    # if the date past 1995
+    if apod_date < min_date:
+         print(f"Error: Date {apod_date.isoformat()} is in past.")
+         sys.exit(1)
+        
      # if the date in the future 
     if apod_date > date.today():
         print(f"Error: Date {apod_date.isoformat()} is in the future.")
@@ -181,14 +192,32 @@ def add_apod_to_cache(apod_date):
     apod_image_url = get_apod_image_url(apod_info)
     print(f'Image url:{apod_image_url}')
     
-     # downlods the APOD image 
+    # downlods the APOD image 
     image_data = image_lib.download_image(apod_image_url)
-    print(f'Downloaded image from {apod_image_url}')
-    
-    # Checks the APOD SHA-256
+     # Checks the APOD SHA-256
     apod_hash = hashlib.sha256(image_data).hexdigest()
     print(f'APOD SHA-256:{apod_hash}')
     
+    
+    image_explantion = apod_info['explanation']
+    
+    APOD_path = determine_apod_file_path(image_title, apod_image_url)
+    
+    hash_1 = get_apod_id_from_db(apod_hash)
+    
+    if hash_1 == 0:
+        print('APOD image is not already in cache.')
+        print(f'APOD file path:{APOD_path}')
+        image_lib.save_image_file(image_data, APOD_path)
+        
+    if not hash_1 == 0 :
+        print('APOD image is already in cache')
+        return hash_1
+    
+
+    else:
+        return 0 
+   
     
     
     
@@ -210,15 +239,9 @@ def add_apod_to_db(title, explanation, file_path, sha256):
     Returns:
         int: The ID of the newly inserted APOD record, if successful.  Zero, if unsuccessful       
     """
-     
-    
-    
-  
     con = sqlite3.connect(image_cache_db)
     cur = con.cursor()
-    
-    
-   
+
     add_apod_query = """
         INSERT INTO apod_image 
         (
@@ -230,13 +253,18 @@ def add_apod_to_db(title, explanation, file_path, sha256):
         VALUES (?, ?, ?, ?);
  """
     
-    apod = (title, explanation, file_path, sha256)
+    img = (title, explanation, file_path, sha256)
     
-    cur.execute(add_apod_query, apod)
+    id = get_apod_id_from_db(sha256)
+    if not id == 0 :
+        return id
     
+    
+    cur.execute(add_apod_query, img)
     con.commit()
     con.close()
-    return 0
+    
+    
 
 def get_apod_id_from_db(image_sha256):
     """Gets the record ID of the APOD in the cache having a specified SHA-256 hash value
@@ -249,8 +277,25 @@ def get_apod_id_from_db(image_sha256):
     Returns:
         int: Record ID of the APOD in the image cache DB, if it exists. Zero, if it does not.
     """
-    # TODO: Complete function body
-    return 0
+    con = sqlite3.connect(image_cache_db)
+    cur = con.cursor()
+    
+    img_query_resltus =  cur.fetchone()
+    if  img_query_resltus == None :
+        return 0
+    if not  img_query_resltus == None: 
+      return img_query_resltus
+   
+    
+    img_query = f""" SELECT id FROM image_apod WHERE sha256 = {image_sha256} """
+    
+    cur.execute(img_query)
+    con.commit()
+    con.close()
+    
+   
+    
+    
 
 def determine_apod_file_path(image_title, image_url):
     """Determines the path at which a newly downloaded APOD image must be 

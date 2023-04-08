@@ -10,7 +10,7 @@ APOD_URL = 'https://api.nasa.gov/planetary/apod'
 
 def main():
     
-    apod_info = get_apod_info('2022-08-08')
+    apod_info = get_apod_info('1999-08-08')
     print(apod_info)
     
     return
