@@ -47,7 +47,7 @@ def main():
     apod_info = get_apod_info(apod_id)
 
     # Set the APOD as the desktop background image
-    if apod_id != 0:
+    if apod_info !=0:
         image_lib.set_desktop_background_image(apod_info['file_path'])
 
 def get_apod_date():
@@ -80,8 +80,8 @@ def get_apod_date():
     
     # if the date past 1995
     if apod_date < min_date:
-         print(f"Error: Date {apod_date.isoformat()} is in past.")
-         sys.exit(1)
+        print(f"Error: Date {apod_date.isoformat()} is in past.")
+        sys.exit(1)
         
      # if the date in the future 
     if apod_date > date.today():
@@ -183,7 +183,7 @@ def add_apod_to_cache(apod_date):
     
     # gets the APOD date 
     apod_info = apod_api.get_apod_info(apod_date)
-    print(f'Getting {apod_date} APOD information from NASA...success')
+    
     
     image_title = apod_info['title']
     print(f'Image title: {image_title}')
@@ -207,13 +207,14 @@ def add_apod_to_cache(apod_date):
     
     if hash_1 == 0:
         print('APOD image is not already in cache.')
+        print('Adding image to cache')
         print(f'APOD file path:{APOD_path}')
         image_lib.save_image_file(image_data, APOD_path)
         apod_id = add_apod_to_db(image_title, image_explantion, APOD_path, apod_hash)
     else:
         print('APOD image is already in cache')
         return hash_1
-    
+
     return apod_id
    
     
@@ -251,7 +252,7 @@ def add_apod_to_db(title, explanation, file_path, sha256):
     
     
     cur.execute(add_apod_query,img)
-    
+    con.commit() 
     con.close()
     
     
@@ -283,7 +284,7 @@ def get_apod_id_from_db(image_sha256):
     if  img_query_resltus == None :
         return 0
     if not  img_query_resltus == None: 
-      return img_query_resltus
+      return img_query_resltus[0]
     con.commit()
     con.close()
     
@@ -342,18 +343,15 @@ def get_apod_info(image_id):
     con.commit()
     con.close()
     
-    if query_result is None:
-        return 0
-
-    apod_info = {
-        'title': query_result[0],
-        'explanation': query_result[1],
-        'file_path': query_result[2]
-    }
-  
-    return apod_info
-    
-    
+    if query_result != 0:
+        apod_info = {
+            'title': query_result[0],
+            'explanation': query_result[1],
+            'file_path': query_result[2]
+         }
+        return apod_info
+    else:
+        return {}
     
 
 def get_all_apod_titles():

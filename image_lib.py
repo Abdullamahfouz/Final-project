@@ -5,9 +5,14 @@ import requests
 import ctypes
  
 def main():
-    image_data = download_image('https://apod.nasa.gov/apod/image/2205/NGC3521LRGBHaAPOD-20.jpg')
-    result = save_image_file(image_data, r'C:\Users\Abdullah\OneDrive\Desktop\COMP 593\Final-project\NGC3521LRGBHaAPOD-20.jpg')
+    image_url = 'https://apod.nasa.gov/apod/image/2304/PolarisIfn_Zayaz_4000.jpg'
+    image_path = r'C:\Users\Abdullah\OneDrive\Desktop\COMP 593\Final-project\NGC3521LRGBHaAPOD-20.jpg'
+    
+    image_data = download_image(image_url)
+    save_image_file(image_data, image_path)
+    set_desktop_background_image(image_path)
     return
+
  
 def download_image(image_url):
     """Downloads an image from a specified URL.

@@ -16,7 +16,7 @@ def main():
     print("Image URL:", image_url)
     
     
-    return
+    return None
 
 def get_apod_info(apod_date):
     """Gets information from the NASA API for the Astronomy 
@@ -26,15 +26,16 @@ def get_apod_info(apod_date):
     Returns:
         dict: Dictionary of APOD info, if successful. None if unsuccessful
     """
-    image_params = {'api_key': API_KEY, 
-              'date': apod_date
-              }
+    image_params = {
+     'api_key': API_KEY, 
+     'date': apod_date
+    }
     
     req = requests.get(APOD_URL, params=image_params)
     
     
     if req.status_code == 200:
-        print('success')
+        print(f'Getting {apod_date} APOD information from NASA...success')
         return req.json()
         
     else:
@@ -59,7 +60,7 @@ def get_apod_image_url(apod_info_dict):
     if media_type == 'image':
         image_url = apod_info_dict['hdurl'] 
         return image_url
-    elif media_type == 'video':
+    if media_type == 'video':
         image_url = apod_info_dict['thumbnail_url']
         return image_url
     else:
