@@ -62,10 +62,10 @@ def get_apod_date():
     Returns:
         date: APOD date
     """
-    # checks if there are more than one command-line arguments 
+    
     
     min_date = date(1995,6,16)
-    
+    # checks if there are more than one command-line arguments
     if len(sys.argv) > 1:
          # tries to covert the agrs into a date 
         try:
@@ -75,7 +75,6 @@ def get_apod_date():
             print(f"Error: Invalid date format: {sys.argv[1]}. PLEASE use this format (YYYY-MM-DD).")
             sys.exit(1)
     # if no date provided just uses today's date 
-    
     else:
         apod_date = date.today()
     
@@ -160,7 +159,7 @@ def init_apod_cache(parent_dir):
         print(f'Image cache DB created: {image_cache_db}')
         print('Image cache DB created.')
     else:
-        print(f'Image cache DB created: {image_cache_db}')
+        
         print('Image cache DB Already exists')
         
 def add_apod_to_cache(apod_date):
@@ -179,12 +178,13 @@ def add_apod_to_cache(apod_date):
     
     """
     
-   # prints APOD date
+    # prints APOD date
     print("APOD date:", apod_date.isoformat())
     
     # gets the APOD date 
     apod_info = apod_api.get_apod_info(apod_date)
     
+    # Extract the image explanation and title from the APOD information
     image_explantion = apod_info['explanation']
     image_title = apod_info['title']
     print(f'Image title: {image_title}')
@@ -193,39 +193,41 @@ def add_apod_to_cache(apod_date):
     apod_image_url = get_apod_image_url(apod_info)
     print(f'Image url:{apod_image_url}')
     
-    # downlods the APOD image 
+    # download the APOD image 
     image_data = image_lib.download_image(apod_image_url)
-     # Checks the APOD SHA-256
+    
+     # Calculate the SHA-256 hash of the downloaded image
     apod_hash = hashlib.sha256(image_data).hexdigest()
     print(f'APOD SHA-256:{apod_hash}')
     
-     # the image path
+     # Determine the file path for the APOD image
     APOD_path = determine_apod_file_path(image_title, apod_image_url)
-    #get the apod id 
+    
+    # Add the APOD information to the image cache database and get the APOD ID
     apod_id = add_apod_to_db(image_title, image_explantion, APOD_path, apod_hash)
    
-    #gets the image hash
+    # Get the APOD ID from the cache using its  hash
     image = get_apod_id_from_db(apod_hash)
     
+    # Save the APOD image file to the cache if it is not already present
     save_image =image_lib.save_image_file(image_data, APOD_path)
     
-    # if the image hash not already in cache it will add it and sve the image in cache
-    if image is 0:
+    # If the APOD image is not already in the cache, add it and save the image to the cache
+    if image == 0:
         print('APOD image is not already in cache.')
         print('Adding image to cache')
         print(f'APOD file path:{APOD_path}')
         
         return save_image, apod_id
     
-    # if the image already exists 
-    if image is not 0:
+    # If the APOD image is already in the cache, return its ID
+    if not image == 0:
         print('APOD image is already in cache')
         return image
     
-    # otherwsie it will returen 0
+    # Return 0 if the APOD image could not be added to the cache
     else:
         return 0
-   
     
 def add_apod_to_db(title, explanation, file_path, sha256):
     """Adds specified APOD information to the image cache DB.
@@ -330,7 +332,7 @@ def determine_apod_file_path(image_title, image_url):
     Returns:
         str: Full path at which the APOD image file must be saved in the image cache directory
     """
-    # Remove leading and trailing spaces, replace inner spaces with underscores, and remove non-alphanumeric characters from the image title
+    # Remove leading and trailing spaces, replace inner spaces with underscores from the image title
     image_title = image_title.strip().replace(' ', '_')
     image_title = re.sub('[^A-Za-z0-9_]+', '', image_title)
     
@@ -365,7 +367,7 @@ def get_apod_info(image_id):
     
   # Execute the query with the given image ID as the parameter and retrieve the result
     cur.execute(select_apod_query, (image_id,))
-    #  retrieve a single row from the result set of a query that has been executed
+    # retrieves a single row from the result set of a query that has been executed
     query_result = cur.fetchone()
     
     # Commit the changes to the database and close the connection
@@ -380,9 +382,9 @@ def get_apod_info(image_id):
   # If the query returned a result, return the APOD information dictionary
     if query_result != 0:
         return apod_info
-    # Otherwise, return an empty dictionary
+    # Otherwise, return none
     else:
-        return {}
+        return None
     
 
 def get_all_apod_titles():
