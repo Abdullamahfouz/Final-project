@@ -10,7 +10,7 @@ APOD_URL = 'https://api.nasa.gov/planetary/apod'
 
 def main():
     
-    apod_info = get_apod_info('1999-08-08')
+    apod_info = get_apod_info('2004-08-08')
     print(apod_info)
     image_url = get_apod_image_url(apod_info)
     print("Image URL:", image_url)
@@ -43,7 +43,7 @@ def get_apod_info(apod_date):
         return req.json()
         
     # If the API call is unsuccessful, returns None
-    elif req.status_code > 200:
+    if req.status_code > 200:
         print('failure to get APOD Information')
         return None
     

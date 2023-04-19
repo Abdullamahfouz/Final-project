@@ -17,7 +17,6 @@ import image_lib
 import inspect
 import sys
 import hashlib
-import requests
 import sqlite3
 from apod_api import get_apod_image_url
 import apod_api
@@ -131,7 +130,6 @@ def init_apod_cache(parent_dir):
      # creates the path for the image cache database  by 
      # joining the image_cache_dir with the database file 
     image_cache_db = os.path.join(image_cache_dir, 'image_cache.db')
-    
     # checks if the file does not already exist
     if not os.path.exists(image_cache_db) :
         # If the database file does not exist, creates a SQLite database by creating 
@@ -156,7 +154,7 @@ def init_apod_cache(parent_dir):
         con.commit()
         # closes the connection to the SQLite database
         con.close()
-        print(f'Image cache DB created: {image_cache_db}')
+        print(f'Image cache DB Dir: {image_cache_db}')
         print('Image cache DB created.')
     else:
         
@@ -181,7 +179,7 @@ def add_apod_to_cache(apod_date):
     # prints APOD date
     print("APOD date:", apod_date.isoformat())
     
-    # gets the APOD date 
+    # gets the APOD date from APOD api
     apod_info = apod_api.get_apod_info(apod_date)
     
     # Extract the image explanation and title from the APOD information
@@ -196,7 +194,7 @@ def add_apod_to_cache(apod_date):
     # download the APOD image 
     image_data = image_lib.download_image(apod_image_url)
     
-     # Calculate the SHA-256 hash of the downloaded image
+     # Calculate the hash of the downloaded image
     apod_hash = hashlib.sha256(image_data).hexdigest()
     print(f'APOD SHA-256:{apod_hash}')
     
@@ -387,15 +385,6 @@ def get_apod_info(image_id):
         return None
     
 
-def get_all_apod_titles():
-    """Gets a list of the titles of all APODs in the image cache
-
-    Returns:
-        list: Titles of all images in the cache
-    """
-    # TODO: Complete function body
-    # NOTE: This function is only needed to support the APOD viewer GUI
-    return
 
 if __name__ == '__main__':
     main()
